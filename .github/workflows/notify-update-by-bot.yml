@@ -19,9 +19,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
+      - name: Fetch Before-push commit
+        run: |
+          git fetch origin $OLDER
       - name: Setup Node.js
         uses: actions/setup-node@v4.1.0
         with:
