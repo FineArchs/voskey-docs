@@ -4,6 +4,13 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      older_commit:
+        description: '古い方のコミットハッシュ（またはブランチ名）'
+        required: true
+      newer_commit:
+        description: '新しい方のコミットハッシュ（またはブランチ名）'
+        default: ${{ github.ref }}
 
 jobs:
   deploy:
@@ -13,8 +20,8 @@ jobs:
       SERVER_URL: ${{ vars.SERVER_URL }}
       PAGES_URL: ${{ vars.PAGES_URL }}
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      OLDER: ${{ github.event.before }}
-      NEWER: ${{ github.event.after }}
+      OLDER: ${{ inputs.older_commit || github.event.before }}
+      NEWER: ${{ inputs.newer_commit || github.event.after }}
 
     steps:
       - name: Checkout
