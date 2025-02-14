@@ -10,7 +10,8 @@ on:
         required: true
       newer_commit:
         description: '新しい方のコミットハッシュ（またはブランチ名）'
-        default: ${{ github.ref }}
+        required: true
+        default: HEAD
 
 jobs:
   deploy:
