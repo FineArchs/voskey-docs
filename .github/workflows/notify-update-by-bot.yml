@@ -8,6 +8,7 @@ on:
       older_commit:
         description: '古い方のコミットハッシュ（またはブランチ名）'
         required: true
+        default: HEAD~1
       newer_commit:
         description: '新しい方のコミットハッシュ（またはブランチ名）'
         required: true
@@ -27,9 +28,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Fetch Before-push commit
-        run: |
-          git fetch origin $OLDER
       - name: Setup Node.js
         uses: actions/setup-node@v4.2.0
         with:
