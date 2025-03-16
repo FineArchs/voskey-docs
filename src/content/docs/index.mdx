@@ -5,7 +5,7 @@ template: splash
 hero:
   tagline: ぼすきーの利用規約や個別ルールを見る事が出来るページです。
   image:
-    file: ../../assets/houston.webp
+    html: <div id="hero-image"></div>
   actions:
     - text: 初めての方はこちら
       link: /for-beginner
@@ -22,6 +22,7 @@ hero:
 ---
 
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import HeroImage from '../../utils/HeroImage.astro';
 
 ## 更新履歴の閲覧
 
@@ -41,3 +42,4 @@ import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 	<LinkCard title="絵文字申請ルール" href="emoji/00-index/">
 	</LinkCard>
 </CardGrid>
+<HeroImage />
