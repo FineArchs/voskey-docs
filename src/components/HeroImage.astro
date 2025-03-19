@@ -1,24 +1,45 @@
 ---
+import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import { Image } from 'astro:assets';
 
-const images = import.meta.glob<{ default: ImageMetadata }>('../assets/*.{jpeg,jpg,png,gif,webp}');
-const image = Object.values(images)[0];
+const imageEntries: (readonly [string, string])[] = await Promise.all(
+	Object.entries(
+		import.meta.glob<{ default: ImageMetadata }>(
+			'@/assets/**/*.{jpeg,jpg,png,gif,webp}'
+		)
+	).map(([path, src]) => getImage({ src: src() }).then(img => [path, img.src] as const))
+);
+
+const end = 0 as const;
+const record: any = {};
+
+for (const [src, hashed] of imageEntries) {
+	const path = src.split('/').reduce((cd, d) => {
+		if (!(d in cd)) cd[d] = {};
+		return cd[d];
+	}, record);
+	path[end] = hashed;
+}
+
+const recordjson = JSON.stringify(record);
 ---
-<div hidden>
-	<Image
-		id="inserted-hero-image"
-		src={image()}
-		loading="eager"
-		decoding="async"
-		alt="image not loaded"
-		width="400"
-		height="400"
-	/>
-</div>
+<div hidden id="hero-image-dataholder" data-recordjson={recordjson} data-end={end} />
+
 <script>
 	const socket = document.getElementById('hero-image')!.parentElement!;
-	const inserted = document.getElementById('inserted-hero-image')!;
-	socket.classList.forEach(c => c.startsWith('astro-') && inserted.classList.add(c));
-	socket.replaceWith(inserted);
+	const dataholder = document.getElementById('hero-image-dataholder')!;
+
+	const pickRandom = <T,>(input: T[]) => input[Math.floor(Math.random() * input.length)];
+	function pickImage(record: any, end: any) {
+		console.log(record);
+		let cd = record;
+		while (!(end in cd)) cd = pickRandom(Object.values(cd));
+		return cd[end];
+	}
+
+	const { recordjson, end } = dataholder.dataset;
+	const record = JSON.parse(recordjson as string);
+	const scopeClass = [...socket.classList].find(c => c.startsWith('astro-'))!;
+
+	socket.outerHTML = `<img src="${pickImage(record, end)}" class="${scopeClass}" loading="eager" decoding="async" width="400" height="400">`;
 </script>
